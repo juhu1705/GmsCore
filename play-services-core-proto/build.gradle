@@ -6,6 +6,8 @@
 apply plugin: 'com.squareup.wire'
 apply plugin: 'kotlin'
 
+apply from: '../gradle/publish-android.gradle'
+
 dependencies {
     implementation "com.squareup.wire:wire-runtime:$wireVersion"
     api "com.squareup.wire:wire-grpc-client:$wireVersion"
