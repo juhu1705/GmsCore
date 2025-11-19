@@ -14,8 +14,6 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.getSystemService
 import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.fido.fido2.api.common.*
-import com.google.android.gms.safetynet.SafetyNet
-import com.google.android.gms.tasks.await
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.microg.gms.common.Constants
 import org.microg.gms.fido.core.*
@@ -140,11 +138,7 @@ class ScreenLockTransportHandler(private val activity: FragmentActivity, callbac
             NoneAttestationObject(authenticatorData)
         } else {
             try {
-                if (SDK_INT >= 24) {
-                    createAndroidKeyAttestation(signature, authenticatorData, clientDataHash, options.rpId, keyId)
-                } else {
-                    createSafetyNetAttestation(authenticatorData, clientDataHash)
-                }
+                createAndroidKeyAttestation(signature, authenticatorData, clientDataHash, options.rpId, keyId)
             } catch (e: Exception) {
                 Log.w("FidoScreenLockTransport", e)
                 NoneAttestationObject(authenticatorData)
@@ -174,21 +168,6 @@ class ScreenLockTransportHandler(private val activity: FragmentActivity, callbac
             EC2Algorithm.ES256,
             sig,
             store.getCertificateChain(rpId, keyId).map { it.encoded })
-    }
-
-    private suspend fun createSafetyNetAttestation(
-        authenticatorData: AuthenticatorData,
-        clientDataHash: ByteArray
-    ): AndroidSafetyNetAttestationObject {
-        val response = SafetyNet.getClient(activity).attest(
-            (authenticatorData.encode() + clientDataHash).digest("SHA-256"),
-            "AIzaSyDqVnJBjE5ymo--oBJt3On7HQx9xNm1RHA"
-        ).await()
-        return AndroidSafetyNetAttestationObject(
-            authenticatorData,
-            Constants.GMS_VERSION_CODE.toString(),
-            response.jwsResult.toByteArray()
-        )
     }
 
     suspend fun sign(

@@ -34,6 +34,8 @@ apply from: '../gradle/publish-android.gradle'
 description = 'microG implementation of play-services-fido'
 
 dependencies {
+    implementation 'androidx.annotation:annotation-jvm:1.9.1'
+
     // Dependencies from play-services-fido:18.1.0
     api project(':play-services-base')
     api project(':play-services-basement')
